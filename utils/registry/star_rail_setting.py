@@ -3,7 +3,7 @@ import winreg
 import json
 
 # Specify the registry key path
-registry_key_path = r"SOFTWARE\miHoYo\崩坏：星穹铁道"
+registry_key_path = r"SOFTWARE\Cognosphere\Star Rail"
 # Specify the value name
 resolution_value_name = "GraphicsSettings_PCResolution_h431323223"
 graphics_value_name = "GraphicsSettings_Model_h2986158309"
