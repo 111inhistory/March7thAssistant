@@ -77,7 +77,15 @@ class Daily:
                 log.info("虚构叙事未开启")
         else:
             log.info("虚构叙事尚未刷新")
-
+            
+        if Date.is_next_mon_x_am(cfg.apocalyptic_timestamp, cfg.refresh_hour):
+            if cfg.apocalyptic_enable:
+                challenge.start("apocalyptic")
+            else:
+                log.info("末日幻影未开启")
+        else:
+            log.info("末日幻影尚未刷新")
+            
         activity.start()
 
         # 优先历战余响
@@ -127,7 +135,7 @@ class Daily:
                 "利用弱点进入战斗并获胜3次": lambda: challenge.start_memory_one(3),
                 "施放终结技造成制胜一击1次": lambda: challenge.start_memory_one(1),
                 "通关「模拟宇宙」（任意世界）的1个区域": lambda: Universe.run_daily(),
-                "完成1次「模拟宇宙」": lambda: Universe.run_daily(),
+                "完成1次「差分宇宙」或「模拟宇宙」": lambda: Universe.run_daily(),
             }
 
             log.hr(f"今日实训", 2)

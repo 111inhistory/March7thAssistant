@@ -1,13 +1,14 @@
 from PyQt5.QtCore import Qt, QUrl
-from PyQt5.QtGui import QDesktopServices
-from PyQt5.QtWidgets import QWidget, QLabel, QFileDialog, QVBoxLayout, QStackedWidget, QSpacerItem
+from PyQt5.QtGui import QDesktopServices, QFont
+from PyQt5.QtWidgets import QWidget, QLabel, QFileDialog, QVBoxLayout, QStackedWidget, QSpacerItem, QScrollArea, QSizePolicy
 from qfluentwidgets import FluentIcon as FIF
-from qfluentwidgets import SettingCardGroup, PushSettingCard, ScrollArea, InfoBar, PrimaryPushSettingCard, Pivot
+from qfluentwidgets import SettingCardGroup, PushSettingCard, ScrollArea, InfoBar, PrimaryPushSettingCard
 from app.sub_interfaces.accounts_interface import accounts_interface
 from .common.style_sheet import StyleSheet
+from .components.pivot import SettingPivot
 from .card.comboboxsettingcard1 import ComboBoxSettingCard1
 from .card.comboboxsettingcard2 import ComboBoxSettingCard2, ComboBoxSettingCardLog
-from .card.switchsettingcard1 import SwitchSettingCard1, SwitchSettingCardTeam, SwitchSettingCardImmersifier, SwitchSettingCardGardenofplenty
+from .card.switchsettingcard1 import SwitchSettingCard1, StartMarch7thAssistantSwitchSettingCard, SwitchSettingCardTeam, SwitchSettingCardImmersifier, SwitchSettingCardGardenofplenty
 from .card.rangesettingcard1 import RangeSettingCard1
 from .card.pushsettingcard1 import PushSettingCardInstance, PushSettingCardNotifyTemplate, PushSettingCardEval, PushSettingCardDate, PushSettingCardKey, PushSettingCardTeam, PushSettingCardFriends
 from .card.timepickersettingcard1 import TimePickerSettingCard1
@@ -24,7 +25,8 @@ class SettingInterface(ScrollArea):
         self.scrollWidget = QWidget()
         self.vBoxLayout = QVBoxLayout(self.scrollWidget)
 
-        self.pivot = Pivot(self)
+        # self.title_area = QScrollArea(self)
+        self.pivot = SettingPivot(self)
         self.stackedWidget = QStackedWidget(self)
 
         self.settingLabel = QLabel(self.tr("设置"), self)
@@ -40,6 +42,31 @@ class SettingInterface(ScrollArea):
         self.setViewportMargins(0, 140, 0, 5)
         self.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
 
+        # self.title_area.setWidget(self.pivot)
+        # self.title_area.setWidgetResizable(True)
+        # self.title_area.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        # self.title_area.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        # self.title_area.setMinimumSize(800, 50)
+        # self.title_area.setStyleSheet("""
+        #     QScrollBar:horizontal {
+        #         height: 4px;
+        #         background: #f0f0f0;
+        #         border-radius: 10px;
+        #     }
+
+        #     QScrollBar::handle:horizontal {
+        #         background: #888;
+        #         border-radius: 10px;
+        #     }
+
+        #     QScrollBar::add-line:horizontal, QScrollBar::sub-line:horizontal {
+        #         background: none;
+        #     }
+
+        #     QScrollBar::handle:horizontal:hover {
+        #         background: #555;
+        #     }
+        # """)
         self.setObjectName('settingInterface')
         self.scrollWidget.setObjectName('scrollWidget')
         self.settingLabel.setObjectName('settingLabel')
@@ -387,7 +414,7 @@ class SettingInterface(ScrollArea):
             self.tr(""),
         )
 
-        self.ForgottenhallGroup = SettingCardGroup(self.tr("忘却之庭"), self.scrollWidget)
+        self.ForgottenhallGroup = SettingCardGroup(self.tr("混沌回忆"), self.scrollWidget)
         self.forgottenhallEnableCard = SwitchSettingCard1(
             FIF.SPEED_HIGH,
             self.tr('启用混沌回忆'),
@@ -457,6 +484,38 @@ class SettingInterface(ScrollArea):
             "purefiction_timestamp"
         )
 
+        self.ApocalypticGroup = SettingCardGroup(self.tr("末日"), self.scrollWidget)
+        self.ApocalypticEnableCard = SwitchSettingCard1(
+            FIF.SPEED_HIGH,
+            self.tr('启用末日幻影'),
+            "",
+            "apocalyptic_enable"
+        )
+        self.ApocalypticLevelCard = PushSettingCardEval(
+            self.tr('修改'),
+            FIF.MINIMIZE,
+            self.tr("关卡范围"),
+            "apocalyptic_level"
+        )
+        self.ApocalypticTeam1Card = PushSettingCardTeam(
+            self.tr('修改'),
+            FIF.FLAG,
+            self.tr("末日幻影队伍1"),
+            "apocalyptic_team1"
+        )
+        self.ApocalypticTeam2Card = PushSettingCardTeam(
+            self.tr('修改'),
+            FIF.FLAG,
+            self.tr("末日幻影队伍2"),
+            "apocalyptic_team2"
+        )
+        self.ApocalypticRunTimeCard = PushSettingCardDate(
+            self.tr('修改'),
+            FIF.DATE_TIME,
+            self.tr("上次运行末日幻影的时间"),
+            "apocalyptic_timestamp"
+        )
+
         self.ProgramGroup = SettingCardGroup(self.tr('程序设置'), self.scrollWidget)
         self.logLevelCard = ComboBoxSettingCardLog(
             "log_level",
@@ -471,12 +530,12 @@ class SettingInterface(ScrollArea):
             self.tr("游戏路径"),
             cfg.game_path
         )
-        self.importConfigCard = PushSettingCard(
-            self.tr('导入'),
-            FIF.ADD_TO,
-            self.tr('导入配置'),
-            self.tr('选择需要导入的 config.yaml 文件（重启后生效）')
-        )
+        # self.importConfigCard = PushSettingCard(
+        #     self.tr('导入'),
+        #     FIF.ADD_TO,
+        #     self.tr('导入配置'),
+        #     self.tr('选择需要导入的 config.yaml 文件（重启后生效）')
+        # )
         self.checkUpdateCard = SwitchSettingCard1(
             FIF.SYNC,
             self.tr('启动时检测更新'),
@@ -549,7 +608,7 @@ class SettingInterface(ScrollArea):
         self.autoBattleDetectEnableCard = SwitchSettingCard1(
             FIF.ROBOT,
             self.tr('启用自动战斗检测'),
-            "只对清体力和忘却之庭场景生效",
+            "只对清体力和逐光捡金场景生效",
             "auto_battle_detect_enable"
         )
         self.autoSetResolutionEnableCard = SwitchSettingCard1(
@@ -564,10 +623,21 @@ class SettingInterface(ScrollArea):
             "通过快捷方式、官方启动器、运行中的游戏进程等方式尝试自动配置游戏路径（未测试国际服）",
             "auto_set_game_path_enable"
         )
+        self.allScreensCard = SwitchSettingCard1(
+            FIF.ZOOM,
+            self.tr('在多显示器上进行截屏'),
+            "默认开启，如果正在使用多显示器且无法正常截屏请开关闭这个",
+            "all_screens"
+        )
+        self.StartMarch7thAssistantCard = StartMarch7thAssistantSwitchSettingCard(
+            FIF.GAME,
+            self.tr('在用户登录时启动'),
+            "用于开机后自动执行完整运行模式"
+        )
         self.keybindingTechniqueCard = PushSettingCardKey(
             self.tr('按住以修改'),
             FIF.LEAF,
-            self.tr("秘技（只对清体力和忘却之庭场景生效）"),
+            self.tr("秘技（只对清体力和逐光捡金场景生效）"),
             "hotkey_technique"
         )
 
@@ -612,6 +682,7 @@ class SettingInterface(ScrollArea):
     def __initLayout(self):
         self.settingLabel.move(36, 30)
         self.pivot.move(40, 80)
+        # self.title_area.move(36, 80)
         # self.vBoxLayout.addWidget(self.pivot, 0, Qt.AlignTop)
         self.vBoxLayout.addWidget(self.stackedWidget, 0, Qt.AlignTop)
         self.vBoxLayout.setContentsMargins(36, 0, 36, 0)
@@ -686,9 +757,15 @@ class SettingInterface(ScrollArea):
         self.PureFictionGroup.addSettingCard(self.purefictionTeam2Card)
         self.PureFictionGroup.addSettingCard(self.purefictionRunTimeCard)
 
+        self.ApocalypticGroup.addSettingCard(self.ApocalypticEnableCard)
+        self.ApocalypticGroup.addSettingCard(self.ApocalypticLevelCard)
+        self.ApocalypticGroup.addSettingCard(self.ApocalypticTeam1Card)
+        self.ApocalypticGroup.addSettingCard(self.ApocalypticTeam2Card)
+        self.ApocalypticGroup.addSettingCard(self.ApocalypticRunTimeCard)
+
         self.ProgramGroup.addSettingCard(self.logLevelCard)
         self.ProgramGroup.addSettingCard(self.gamePathCard)
-        self.ProgramGroup.addSettingCard(self.importConfigCard)
+        # self.ProgramGroup.addSettingCard(self.importConfigCard)
         self.ProgramGroup.addSettingCard(self.checkUpdateCard)
         self.ProgramGroup.addSettingCard(self.afterFinishCard)
         self.ProgramGroup.addSettingCard(self.loopModeCard)
@@ -704,6 +781,8 @@ class SettingInterface(ScrollArea):
         self.MiscGroup.addSettingCard(self.autoBattleDetectEnableCard)
         self.MiscGroup.addSettingCard(self.autoSetResolutionEnableCard)
         self.MiscGroup.addSettingCard(self.autoSetGamePathEnableCard)
+        self.MiscGroup.addSettingCard(self.allScreensCard)
+        self.MiscGroup.addSettingCard(self.StartMarch7thAssistantCard)
         self.MiscGroup.addSettingCard(self.keybindingTechniqueCard)
 
         self.AboutGroup.addSettingCard(self.githubCard)
@@ -719,8 +798,9 @@ class SettingInterface(ScrollArea):
         self.addSubInterface(self.ActivityGroup, 'ActivityInterface', self.tr('活动'))
         self.addSubInterface(self.FightGroup, 'FightInterface', self.tr('锄大地'))
         self.addSubInterface(self.UniverseGroup, 'UniverseInterface', self.tr('宇宙'))
-        self.addSubInterface(self.ForgottenhallGroup, 'ForgottenhallInterface', self.tr('忘却'))
+        self.addSubInterface(self.ForgottenhallGroup, 'ForgottenhallInterface', self.tr('混沌'))
         self.addSubInterface(self.PureFictionGroup, 'PureFictionInterface', self.tr('虚构'))
+        self.addSubInterface(self.ApocalypticGroup, 'ApocalypticInterface', self.tr('末日'))
 
         self.pivot.addItem(
             routeKey='verticalBar',
@@ -743,7 +823,7 @@ class SettingInterface(ScrollArea):
         self.stackedWidget.setFixedHeight(self.stackedWidget.currentWidget().sizeHint().height())
 
     def __connectSignalToSlot(self):
-        self.importConfigCard.clicked.connect(self.__onImportConfigCardClicked)
+        # self.importConfigCard.clicked.connect(self.__onImportConfigCardClicked)
         self.gamePathCard.clicked.connect(self.__onGamePathCardClicked)
 
         # self.borrowCharacterInfoCard.clicked.connect(self.__openCharacterFolder())
@@ -782,12 +862,12 @@ class SettingInterface(ScrollArea):
         self.verticalScrollBar().setValue(0)
         self.stackedWidget.setFixedHeight(self.stackedWidget.currentWidget().sizeHint().height())
 
-    def __onImportConfigCardClicked(self):
-        configdir, _ = QFileDialog.getOpenFileName(self, "选取配置文件", "./", "Config Files (*.yaml)")
-        if (configdir != ""):
-            cfg._load_config(configdir)
-            cfg.save_config()
-            self.__showRestartTooltip()
+    # def __onImportConfigCardClicked(self):
+    #     configdir, _ = QFileDialog.getOpenFileName(self, "选取配置文件", "./", "Config Files (*.yaml)")
+    #     if (configdir != ""):
+    #         cfg._load_config(configdir)
+    #         cfg.save_config()
+    #         self.__showRestartTooltip()
 
     def __onGamePathCardClicked(self):
         game_path, _ = QFileDialog.getOpenFileName(self, "选择游戏路径", "", "All Files (*)")
@@ -802,10 +882,10 @@ class SettingInterface(ScrollArea):
     def __openUrl(self, url):
         return lambda: QDesktopServices.openUrl(QUrl(url))
 
-    def __showRestartTooltip(self):
-        InfoBar.success(
-            self.tr('更新成功'),
-            self.tr('配置在重启软件后生效'),
-            duration=1500,
-            parent=self
-        )
+    # def __showRestartTooltip(self):
+    #     InfoBar.success(
+    #         self.tr('更新成功'),
+    #         self.tr('配置在重启软件后生效'),
+    #         duration=1500,
+    #         parent=self
+    #     )
