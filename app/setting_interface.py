@@ -8,11 +8,12 @@ from .common.style_sheet import StyleSheet
 from .components.pivot import SettingPivot
 from .card.comboboxsettingcard1 import ComboBoxSettingCard1
 from .card.comboboxsettingcard2 import ComboBoxSettingCard2, ComboBoxSettingCardLog
-from .card.switchsettingcard1 import SwitchSettingCard1, StartMarch7thAssistantSwitchSettingCard, SwitchSettingCardTeam, SwitchSettingCardImmersifier, SwitchSettingCardGardenofplenty
+from .card.switchsettingcard1 import SwitchSettingCard1, SwitchSettingCardNotify, StartMarch7thAssistantSwitchSettingCard, SwitchSettingCardTeam, SwitchSettingCardImmersifier, SwitchSettingCardGardenofplenty
 from .card.rangesettingcard1 import RangeSettingCard1
 from .card.pushsettingcard1 import PushSettingCardInstance, PushSettingCardNotifyTemplate, PushSettingCardEval, PushSettingCardDate, PushSettingCardKey, PushSettingCardTeam, PushSettingCardFriends
 from .card.timepickersettingcard1 import TimePickerSettingCard1
 from module.config import cfg
+from module.notification import notif
 from tasks.base.tasks import start_task
 from .tools.check_update import checkUpdate
 import os
@@ -269,7 +270,7 @@ class SettingInterface(ScrollArea):
         self.activityPlanarFissureEnableCard = SwitchSettingCard1(
             FIF.CALORIES,
             self.tr('启用位面分裂'),
-            "存在双倍次数时体力优先「合成沉浸器」",
+            "存在双倍次数时体力优先「饰品提取」",
             "activity_planarfissure_enable"
         )
 
@@ -378,8 +379,8 @@ class SettingInterface(ScrollArea):
         )
         self.universeBonusEnableCard = SwitchSettingCard1(
             FIF.IOT,
-            self.tr('领取沉浸奖励'),
-            None,
+            self.tr('领取沉浸奖励/执行饰品提取'),
+            "类别为“模拟宇宙”时，自动领取沉浸奖励。类别为“差分宇宙”时，在领取积分奖励后自动执行饰品提取消耗沉浸器。",
             "universe_bonus_enable"
         )
         self.universeFrequencyCard = ComboBoxSettingCard2(
@@ -597,18 +598,46 @@ class SettingInterface(ScrollArea):
             self.tr("消息推送格式"),
             "notify_template"
         )
-        self.winotifyEnableCard = SwitchSettingCard1(
-            FIF.BACK_TO_WINDOW,
-            self.tr('启用 Windows 原生通知'),
-            None,
-            "notify_winotify_enable"
-        )
+
+        self.notifyEnableGroup = []
+        self.notifyLogoDict = {
+            "winotify": FIF.BACK_TO_WINDOW,
+            "telegram": FIF.AIRPLANE,
+            "serverchanturbo": FIF.ROBOT,
+            "serverchan3": FIF.ROBOT,
+            # "bark": FIF.MAIL,
+            "smtp": FIF.MAIL,
+            # "dingtalk": FIF.MAIL,
+            # "pushplus": FIF.MAIL,
+            # "wechatworkapp": FIF.MAIL,
+            # "wechatworkbot": FIF.MAIL,
+            # "onebot": FIF.MAIL,
+            # "gocqhttp": FIF.MAIL,
+            # "gotify": FIF.MAIL,
+            # "discord": FIF.MAIL,
+            # "pushdeer": FIF.MAIL,
+            # "lark": FIF.MAIL,
+            # "custom": FIF.MAIL
+        }
+        self.notifySupportImage = ["telegram", "smtp", "wechatworkapp", "onebot", "gocqhttp", "lark", "custom"]
+
+        for key, _ in cfg.config.items():
+            if key.startswith("notify_") and key.endswith("_enable"):
+                notifier_name = key[len("notify_"):-len("_enable")]
+
+                notifyEnableCard = SwitchSettingCardNotify(
+                    self.notifyLogoDict[notifier_name] if notifier_name in self.notifyLogoDict else FIF.MAIL,
+                    self.tr(f'启用 {notifier_name.capitalize()} 通知 {"（支持图片）"if notifier_name in self.notifySupportImage else ""}'),
+                    notifier_name,
+                    key
+                )
+                self.notifyEnableGroup.append(notifyEnableCard)
 
         self.MiscGroup = SettingCardGroup(self.tr("杂项"), self.scrollWidget)
         self.autoBattleDetectEnableCard = SwitchSettingCard1(
             FIF.ROBOT,
             self.tr('启用自动战斗检测'),
-            "只对清体力和逐光捡金场景生效",
+            "只对清体力和逐光捡金场景生效，并在启动游戏前自动检测并修改注册表值",
             "auto_battle_detect_enable"
         )
         self.autoSetResolutionEnableCard = SwitchSettingCard1(
@@ -776,7 +805,8 @@ class SettingInterface(ScrollArea):
 
         self.NotifyGroup.addSettingCard(self.testNotifyCard)
         self.NotifyGroup.addSettingCard(self.notifyTemplateCard)
-        self.NotifyGroup.addSettingCard(self.winotifyEnableCard)
+        for value in self.notifyEnableGroup:
+            self.NotifyGroup.addSettingCard(value)
 
         self.MiscGroup.addSettingCard(self.autoBattleDetectEnableCard)
         self.MiscGroup.addSettingCard(self.autoSetResolutionEnableCard)
