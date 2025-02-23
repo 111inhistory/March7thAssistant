@@ -125,7 +125,7 @@ class SettingInterface(ScrollArea):
         self.useReservedTrailblazePowerEnableCard = SwitchSettingCard1(
             FIF.HEART,
             self.tr('使用后备开拓力'),
-            "单次上限240点，全部使用需要将“任务完成后”选项修改为“循环”，然后点击“完整运行”",
+            "单次上限300点，全部使用需要将“任务完成后”选项修改为“循环”，然后点击“完整运行”",
             "use_reserved_trailblaze_power"
         )
         self.useFuelEnableCard = SwitchSettingCard1(
@@ -549,7 +549,13 @@ class SettingInterface(ScrollArea):
             self.tr('任务完成后'),
             self.tr('其中“退出”指退出游戏，“循环”指7×24小时无人值守循环运行程序（仅限完整运行生效）'),
             texts={'无': 'None', '退出': 'Exit', '循环': 'Loop',
-                   '关机': 'Shutdown', '睡眠': 'Sleep', '休眠': 'Hibernate', '重启': 'Restart', '注销': 'Logoff'}
+                   '关机': 'Shutdown', '睡眠': 'Sleep', '休眠': 'Hibernate', '重启': 'Restart', '注销': 'Logoff', '运行脚本': 'RunScript'}
+        )
+        self.ScriptPathCard = PushSettingCard(
+            self.tr('修改'),
+            FIF.CODE,
+            self.tr("脚本或程序路径(选择运行脚本时生效)"),
+            cfg.script_path
         )
         self.loopModeCard = ComboBoxSettingCard2(
             "loop_mode",
@@ -571,7 +577,7 @@ class SettingInterface(ScrollArea):
         )
         self.powerLimitCard = RangeSettingCard1(
             "power_limit",
-            [10, 240],
+            [10, 300],
             FIF.HEART,
             # self.tr("循环运行再次启动所需开拓力（游戏刷新后优先级更高）"),
             self.tr("循环运行再次启动所需开拓力"),
@@ -619,7 +625,7 @@ class SettingInterface(ScrollArea):
             # "lark": FIF.MAIL,
             # "custom": FIF.MAIL
         }
-        self.notifySupportImage = ["telegram", "smtp", "wechatworkapp", "onebot", "gocqhttp", "lark", "custom"]
+        self.notifySupportImage = ["telegram", "matrix", "smtp", "wechatworkapp", "onebot", "gocqhttp", "lark", "custom"]
 
         for key, _ in cfg.config.items():
             if key.startswith("notify_") and key.endswith("_enable"):
@@ -797,6 +803,7 @@ class SettingInterface(ScrollArea):
         # self.ProgramGroup.addSettingCard(self.importConfigCard)
         self.ProgramGroup.addSettingCard(self.checkUpdateCard)
         self.ProgramGroup.addSettingCard(self.afterFinishCard)
+        self.ProgramGroup.addSettingCard(self.ScriptPathCard)
         self.ProgramGroup.addSettingCard(self.loopModeCard)
         self.ProgramGroup.addSettingCard(self.scheduledCard)
         self.ProgramGroup.addSettingCard(self.playAudioCard)
@@ -855,7 +862,7 @@ class SettingInterface(ScrollArea):
     def __connectSignalToSlot(self):
         # self.importConfigCard.clicked.connect(self.__onImportConfigCardClicked)
         self.gamePathCard.clicked.connect(self.__onGamePathCardClicked)
-
+        self.ScriptPathCard.clicked.connect(self.__onScriptPathCardClicked)
         # self.borrowCharacterInfoCard.clicked.connect(self.__openCharacterFolder())
 
         self.testNotifyCard.clicked.connect(lambda: start_task("notify"))
@@ -919,3 +926,9 @@ class SettingInterface(ScrollArea):
     #         duration=1500,
     #         parent=self
     #     )
+    def __onScriptPathCardClicked(self):
+        script_path, _ = QFileDialog.getOpenFileName(self, "脚本或程序路径", "", "脚本或可执行文件 (*.ps1 *.bat *.exe)")
+        if not script_path or cfg.script_path == script_path:
+            return
+        cfg.set_value("script_path", script_path)
+        self.ScriptPathCard.setContent(script_path)
