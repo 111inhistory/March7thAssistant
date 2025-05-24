@@ -193,3 +193,6 @@ pyrightconfig.json
 
 # notify for smtp
 smtp_temp.bin
+.python-version
+pyproject.toml
+uv.lock
